@@ -1,0 +1,14 @@
+﻿services:
+  hephaestus:
+    image: hephaestus
+    build:
+      context: .
+      dockerfile: Hephaestus/Dockerfile
+
+  postgres:
+    image: postgres:18
+    container_name: my_postgres
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"

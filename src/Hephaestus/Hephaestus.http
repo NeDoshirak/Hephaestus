@@ -1,0 +1,6 @@
+@Hephaestus_HostAddress = http://localhost:5147
+
+GET {{Hephaestus_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
