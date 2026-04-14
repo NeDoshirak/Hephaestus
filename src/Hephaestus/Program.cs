@@ -1,3 +1,5 @@
+using Hephaestus.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,6 +10,8 @@ builder.Services.AddOpenApi();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddApiClients(builder.Configuration);
 
 var app = builder.Build();
 

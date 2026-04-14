@@ -282,6 +282,11 @@ ServiceFabricBackup/
 *.ldf
 *.ndf
 
+# Rider / IntelliJ IDEA
+.idea/
+*.sln.iml
+*.idea/
+
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout
