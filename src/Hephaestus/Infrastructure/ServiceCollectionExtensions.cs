@@ -1,5 +1,4 @@
-﻿using Duende.AccessTokenManagement;
-using Duende.IdentityModel.Client;
+﻿using System.Net.Http.Headers;
 using Hephaestus.Features.HeadHunterClient;
 
 namespace Hephaestus.Infrastructure;
@@ -30,22 +29,12 @@ public static class ServiceCollectionExtensions
         }
         
         services.Configure<HeadHunterClientSettings>(configuration.GetSection("HeadHunter"));
-        
-        services.AddClientCredentialsTokenManagement()
-            .AddClient("headhunter", client =>
-            {
-                client.TokenEndpoint = new Uri(settings.TokenEndpoint);
-                client.ClientId = ClientId.Parse(settings.ClientId);
-                client.ClientSecret = ClientSecret.Parse(settings.ClientSecret);
-                
-                client.Parameters = new Parameters
-                {
-                    { "grant_type", settings.GrantType }
-                };
-            });   
-        
-        services.AddHttpClient<IHeadHunterClient, HeadHunterClient>(client => 
-                client.DefaultRequestHeaders.Add("User-Agent", "SkillSpace/0.1 (ujhjvjn@yandex.ru)"))
-            .AddClientCredentialsTokenHandler(ClientCredentialsClientName.Parse("headhunter"));
+
+        services.AddHttpClient<IHeadHunterClient, HeadHunterClient>(client =>
+        {
+            client.DefaultRequestHeaders.Add("HH-User-Agent", "SkillSpace/0.1 (ujhjvjn@yandex.ru)");
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", configuration.GetSection("HeadHunter:AccessToken").Value);
+        });
     }
 }

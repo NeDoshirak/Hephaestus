@@ -16,5 +16,7 @@ public class HeadHunterClientSettings
     
     public string GrantType { get; set; } = string.Empty;
     
+    public string AccessToken { get; set; } = string.Empty;
+    
     public int TimeoutSeconds { get; set; }
 }
