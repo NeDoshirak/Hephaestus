@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Hephaestus.Features.HeadHunterClient;
+using Hephaestus.Features.VacancySaver;
 
 namespace Hephaestus.Infrastructure;
 
@@ -10,6 +11,8 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         ConfigureClients(services, configuration);
+        
+        services.AddScoped<IVacancySaver, VacancySaver>();
         
         return services;
     }

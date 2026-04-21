@@ -9,6 +9,8 @@
     image: postgres:18
     container_name: my_postgres
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"

@@ -2,5 +2,5 @@
 
 public interface IVacancySaver
 {
-    public Task SaveVacancyToDatabaseAsync(string vacancyName, int? vacancyCount = null);
+    public Task SaveVacancyToDatabaseAsync(string vacancyName);
 }
