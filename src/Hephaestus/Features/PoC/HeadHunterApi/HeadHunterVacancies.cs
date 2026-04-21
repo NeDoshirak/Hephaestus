@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hephaestus.Features.PoC.HeadHunterApi;
 
 [ApiController]
-[Route("[controller]")]
-public class HeadHunterVacancies(IHeadHunterClient client, IVacancySaver vacancySaver) : ControllerBase 
+[Route("api/[controller]")]
+public class HeadHunterVacancies(IHeadHunterClient client) : ControllerBase 
 {
     [HttpGet("vacancies")]
     public async Task<IActionResult> SearchVacancies([FromQuery] string search, [FromQuery] int page = 0,
