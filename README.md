@@ -77,12 +77,24 @@ ClickHouse (аналитика)
 
 ### Запуск с Docker Compose
 
-```bash
-# Клонируй репозиторий
-git clone <repo-url>
-cd Hephaestus
+**Перед первым запуском:** настрой секреты для HeadHunter
 
-# Запусти все сервисы одной командой
+```bash
+# 1. Скопируй пример конфига
+cp .env.example .env
+
+# 2. Открой .env и заполни свои секреты:
+#    HEADHUNTER_ACCESS_TOKEN=...
+#    HEADHUNTER_CLIENT_SECRET=...
+# 
+#    Если у тебя уже есть секреты в dotnet user-secrets, используй их оттуда:
+#    cd src/Hephaestus && dotnet user-secrets list
+```
+
+Затем запусти все сервисы:
+
+```bash
+cd Hephaestus
 docker compose up
 ```
 

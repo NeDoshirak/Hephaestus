@@ -16,6 +16,13 @@
     build:
       context: .
       dockerfile: Hephaestus/Dockerfile
+    environment:
+      - HeadHunter__AccessToken=${HEADHUNTER_ACCESS_TOKEN}
+      - HeadHunter__ClientSecret=${HEADHUNTER_CLIENT_SECRET}
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "7168:8080"
+      - "7169:8081"
 
   postgres:
     image: postgres:18
