@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { Trash2, Edit2, ExternalLink, Plus, Minus } from 'lucide-react';
 import { RawVacancy } from '@/types/vacancy';
 import { stripHtmlTags, truncateText } from '@/utils/html';
+import { Drawer } from '@/components/Common/Drawer';
 
 interface VacancyCardProps {
   vacancy: RawVacancy;
@@ -16,7 +17,7 @@ export const VacancyCard: FC<VacancyCardProps> = ({
   onDelete,
   isDeleting,
 }) => {
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
   const [areSkillsExpanded, setAreSkillsExpanded] = useState(false);
 
   const cleanedDescription = stripHtmlTags(vacancy.vacancyDescription);
@@ -42,41 +43,29 @@ export const VacancyCard: FC<VacancyCardProps> = ({
           <div className="flex-1 overflow-y-auto min-h-0">
             {/* Description */}
             <div className="mb-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="text-gray-600 text-sm flex-1 prose prose-sm max-w-none">
-                  {isDescriptionExpanded ? (
-                    <div
-                      className="prose-p:m-0 prose-ul:my-2 prose-li:my-0 prose-strong:font-semibold prose-em:italic"
-                      dangerouslySetInnerHTML={{
-                        __html: vacancy.vacancyDescription,
-                      }}
-                    />
-                  ) : (
-                    <p>{descriptionPreview}</p>
-                  )}
-                </div>
-                {showDescriptionToggle && (
-                  <button
-                    onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                    className="flex-shrink-0 p-1 text-primary hover:bg-primary hover:bg-opacity-10 rounded transition-colors"
-                    title={isDescriptionExpanded ? 'Свернуть' : 'Развернуть'}
-                  >
-                    {isDescriptionExpanded ? <Minus size={18} /> : <Plus size={18} />}
-                  </button>
-                )}
+              <div className="text-gray-600 text-sm prose prose-sm max-w-none">
+                <p>{descriptionPreview}</p>
               </div>
+              {showDescriptionToggle && (
+                <button
+                  onClick={() => setIsDescriptionModalOpen(true)}
+                  className="mt-2 text-primary hover:text-blue-600 text-sm font-medium transition-colors"
+                >
+                  Читать полностью →
+                </button>
+              )}
             </div>
 
             {/* Skills */}
             {vacancy.keySkills && vacancy.keySkills.length > 0 && (
               <div className="mb-4">
                 <div className="flex flex-wrap gap-2">
-                  {visibleSkills.map((skill) => (
+                  {visibleSkills.map((skill, idx) => (
                     <span
-                      key={skill.id}
-                      className="inline-block px-3 py-1 bg-primary bg-opacity-10 text-primary text-xs font-medium rounded-full"
+                      key={skill.id || idx}
+                      className="inline-block px-3 py-1 bg-primary bg-opacity-10 text-primary text-xs font-medium rounded-full hover:bg-opacity-20 transition-colors cursor-default"
                     >
-                      {skill.name}
+                      {skill.name || 'Навык'}
                     </span>
                   ))}
                   {hiddenSkillsCount > 0 && !areSkillsExpanded && (
@@ -156,6 +145,61 @@ export const VacancyCard: FC<VacancyCardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Description Drawer */}
+      <Drawer
+        isOpen={isDescriptionModalOpen}
+        onClose={() => setIsDescriptionModalOpen(false)}
+        title={vacancy.vacancyName}
+      >
+        <div>
+          <h3 className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            Описание вакансии
+          </h3>
+          <div className="prose prose-sm max-w-none">
+            <div
+              className="text-gray-700 prose-p:m-0 prose-p:mb-3 prose-ul:my-2 prose-li:my-0 prose-strong:font-semibold prose-em:italic prose-a:text-primary hover:prose-a:text-blue-600"
+              dangerouslySetInnerHTML={{
+                __html: vacancy.vacancyDescription,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Skills in drawer */}
+        {vacancy.keySkills && vacancy.keySkills.length > 0 && (
+          <div>
+            <h3 className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+              Требуемые навыки ({vacancy.keySkills.length})
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {vacancy.keySkills.map((skill, idx) => (
+                <span
+                  key={skill.id || idx}
+                  className="px-3 py-2 bg-gradient-to-r from-primary to-blue-400 text-white text-xs font-medium rounded-full shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {skill.name || 'Навык'}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* URL in drawer */}
+        {vacancy.url && (
+          <div className="pt-4">
+            <a
+              href={vacancy.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-3 bg-primary hover:bg-blue-600 text-white rounded-lg font-medium transition-colors w-full justify-center"
+            >
+              <ExternalLink size={18} />
+              Открыть на HeadHunter
+            </a>
+          </div>
+        )}
+      </Drawer>
     </div>
   );
 };
