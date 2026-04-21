@@ -28,6 +28,7 @@ interface HhVacancyDetail {
 }
 
 export const HhSearchPage: FC = () => {
+  const [inputValue, setInputValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedVacancyId, setSelectedVacancyId] = useState<string | null>(null);
@@ -53,8 +54,9 @@ export const HhSearchPage: FC = () => {
   const totalPages = Math.ceil(totalResults / pageSize);
 
   const handleSearch = () => {
-    if (searchQuery.trim()) {
-      setCurrentPage(1); // Сбросить на первую страницу при новом поиске
+    if (inputValue.trim()) {
+      setSearchQuery(inputValue);
+      setCurrentPage(1);
     }
   };
 
@@ -71,15 +73,15 @@ export const HhSearchPage: FC = () => {
           <div className="flex gap-2">
             <Input
               placeholder="Frontend Developer, React, Python..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               disabled={isSearching}
               className="flex-1"
             />
             <Button
               onClick={handleSearch}
-              disabled={!searchQuery.trim() || isSearching}
+              disabled={!inputValue.trim() || isSearching}
               isLoading={isSearching}
               className="px-6"
             >
@@ -112,7 +114,7 @@ export const HhSearchPage: FC = () => {
                   {searchResults.map((vacancy) => (
                     <button
                       key={vacancy.id}
-                      onClick={() => handleSelectVacancy(vacancy)}
+                      onClick={() => setSelectedVacancyId(vacancy.id)}
                       className={`w-full text-left p-3 border-b border-gray-100 hover:bg-blue-50 transition-colors ${
                         selectedVacancyId === vacancy.id
                           ? 'bg-primary bg-opacity-10 border-l-4 border-l-primary'
@@ -142,7 +144,7 @@ export const HhSearchPage: FC = () => {
                     <Pagination
                       currentPage={currentPage}
                       totalPages={totalPages}
-                      onPageChange={(page) => handleSearch(page - 1)}
+                      onPageChange={setCurrentPage}
                     />
                   </div>
                 )}

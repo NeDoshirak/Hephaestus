@@ -17,11 +17,24 @@ public class VacancyController(IVacancySaver vacancySaver, AppDbContext dbContex
         return Ok();
     }
 
+    [HttpGet("skills")]
+    public async Task<IActionResult> GetAllSkills()
+    {
+        var skills = await dbContext.KeySkills
+            .Select(k => k.Name)
+            .Distinct()
+            .OrderBy(s => s)
+            .ToListAsync();
+
+        return Ok(new { items = skills });
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetVacancies(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
-        [FromQuery] string? search = null)
+        [FromQuery] string? search = null,
+        [FromQuery] string? skillFilter = null)
     {
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 10;
@@ -33,6 +46,12 @@ public class VacancyController(IVacancySaver vacancySaver, AppDbContext dbContex
             query = query.Where(r =>
                 r.VacancyName.Contains(search) ||
                 r.VacancyDescription.Contains(search));
+        }
+
+        if (!string.IsNullOrWhiteSpace(skillFilter))
+        {
+            query = query.Where(r =>
+                r.KeySkills.Any(ks => ks.Name.Contains(skillFilter)));
         }
 
         var total = await query.CountAsync();

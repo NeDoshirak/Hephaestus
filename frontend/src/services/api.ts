@@ -26,14 +26,21 @@ apiClient.interceptors.response.use(
 );
 
 export const vacancyAPI = {
-  // Get paginated list of vacancies with optional search
-  async list(page: number = 1, pageSize: number = 10, search?: string): Promise<VacancyListResponse> {
+  // Get paginated list of vacancies with optional search and skill filter
+  async list(page: number = 1, pageSize: number = 10, search?: string, skillFilter?: string): Promise<VacancyListResponse> {
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('pageSize', pageSize.toString());
     if (search) params.append('search', search);
+    if (skillFilter) params.append('skillFilter', skillFilter);
 
     const response = await apiClient.get<VacancyListResponse>('/vacancy', { params });
+    return response.data;
+  },
+
+  // Get all available skills
+  async getSkills(): Promise<{ items: string[] }> {
+    const response = await apiClient.get<{ items: string[] }>('/vacancy/skills');
     return response.data;
   },
 

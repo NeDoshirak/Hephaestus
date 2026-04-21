@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { vacancyAPI } from '@/services/api';
 import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest } from '@/types/vacancy';
 
-export function useVacancies(page: number = 1, pageSize: number = 10, search?: string) {
+export function useVacancies(page: number = 1, pageSize: number = 10, search?: string, skillFilter?: string) {
   const queryClient = useQueryClient();
 
   // Fetch vacancies
@@ -13,25 +13,16 @@ export function useVacancies(page: number = 1, pageSize: number = 10, search?: s
     isError,
     error,
   } = useQuery({
-    queryKey: ['vacancies', page, pageSize, search],
-    queryFn: () => vacancyAPI.list(page, pageSize, search),
+    queryKey: ['vacancies', page, pageSize, search, skillFilter],
+    queryFn: () => vacancyAPI.list(page, pageSize, search, skillFilter),
   });
 
   // Create vacancy mutation
   const createMutation = useMutation({
     mutationFn: (data: CreateVacancyRequest) => vacancyAPI.create(data),
-    onSuccess: (newVacancy) => {
-      // Добавить новую вакансию в кеш первой страницы (где она появится)
-      queryClient.setQueryData(['vacancies', 1, pageSize, search], (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          items: [newVacancy, ...old.items],
-          total: old.total + 1,
-        };
-      });
-      // Инвалидировать остальные страницы так как позиции сдвинулись
-      queryClient.invalidateQueries({ queryKey: ['vacancies'], refetchPage: (page) => page !== 0 });
+    onSuccess: () => {
+      // Инвалидировать все vacancies queries чтобы они перезагрузились
+      queryClient.invalidateQueries({ queryKey: ['vacancies'] });
     },
   });
 
@@ -39,17 +30,9 @@ export function useVacancies(page: number = 1, pageSize: number = 10, search?: s
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateVacancyRequest }) =>
       vacancyAPI.update(id, data),
-    onSuccess: (updatedVacancy) => {
-      // Обновить вакансию во всех кешах где она есть
-      queryClient.setQueryData(['vacancies', page, pageSize, search], (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          items: old.items.map((item: RawVacancy) =>
-            item.id === updatedVacancy.id ? updatedVacancy : item
-          ),
-        };
-      });
+    onSuccess: () => {
+      // Инвалидировать все vacancies queries чтобы они перезагрузились
+      queryClient.invalidateQueries({ queryKey: ['vacancies'] });
     },
   });
 
@@ -57,17 +40,8 @@ export function useVacancies(page: number = 1, pageSize: number = 10, search?: s
   const deleteMutation = useMutation({
     mutationFn: (id: string) => vacancyAPI.delete(id),
     onSuccess: (_, deletedId) => {
-      // Удалить вакансию из кеша текущей страницы
-      queryClient.setQueryData(['vacancies', page, pageSize, search], (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          items: old.items.filter((item: RawVacancy) => item.id !== deletedId),
-          total: Math.max(0, old.total - 1),
-        };
-      });
-      // Инвалидировать первую страницу чтобы обновился счётчик
-      queryClient.invalidateQueries({ queryKey: ['vacancies', 1, pageSize, search] });
+      // Инвалидировать все vacancies queries чтобы они перезагрузились
+      queryClient.invalidateQueries({ queryKey: ['vacancies'] });
     },
   });
 

@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { Search, Plus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { Layout } from '@/components/Layout/Layout';
 import { VacancyCard } from '@/components/Vacancies/VacancyCard';
 import { Button } from '@/components/Common/Button';
@@ -7,8 +8,10 @@ import { Input } from '@/components/Common/Input';
 import { Modal } from '@/components/Common/Modal';
 import { Pagination } from '@/components/Common/Pagination';
 import { Loading } from '@/components/Common/Loading';
+import { SkillFilter } from '@/components/Common/SkillFilter';
 import { VacancyForm } from '@/components/Vacancies/VacancyForm';
 import { useVacancies } from '@/hooks/useVacancies';
+import { vacancyAPI } from '@/services/api';
 import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest } from '@/types/vacancy';
 
 export const VacanciesPage: FC = () => {
@@ -16,8 +19,16 @@ export const VacanciesPage: FC = () => {
   const [pageSize] = useState(10);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [skillFilter, setSkillFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedVacancy, setSelectedVacancy] = useState<RawVacancy | undefined>();
+
+  // Fetch available skills
+  const { data: skillsData } = useQuery({
+    queryKey: ['skills'],
+    queryFn: () => vacancyAPI.getSkills(),
+    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
+  });
 
   const {
     vacancies,
@@ -31,7 +42,7 @@ export const VacanciesPage: FC = () => {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useVacancies(page, pageSize, search);
+  } = useVacancies(page, pageSize, search, skillFilter);
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -90,8 +101,8 @@ export const VacanciesPage: FC = () => {
         </div>
 
         {/* Search and Create */}
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1 flex gap-2">
+        <div className="flex gap-4 mb-6 flex-wrap items-center">
+          <div className="flex-1 flex gap-2 min-w-64">
             <Input
               placeholder="Поиск по названию или описанию..."
               value={searchInput}
@@ -105,6 +116,14 @@ export const VacanciesPage: FC = () => {
               <Search size={20} />
             </Button>
           </div>
+          <SkillFilter
+            value={skillFilter}
+            onChange={(newSkill) => {
+              setSkillFilter(newSkill);
+              setPage(1);
+            }}
+            skills={skillsData?.items || []}
+          />
           <Button
             onClick={handleCreateClick}
             className="px-6"
@@ -127,7 +146,7 @@ export const VacanciesPage: FC = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-max md:auto-rows-fr">
               {vacancies.map((vacancy) => (
                 <VacancyCard
                   key={vacancy.id}
