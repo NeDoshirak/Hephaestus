@@ -24,7 +24,7 @@ export const VacancyCard: FC<VacancyCardProps> = ({
   const descriptionPreview = truncateText(cleanedDescription, 150);
   const showDescriptionToggle = cleanedDescription.length > 150;
 
-  const visibleSkills = areSkillsExpanded ? vacancy.keySkills : (vacancy.keySkills?.slice(0, 5) ?? []);
+  const visibleSkills = (areSkillsExpanded ? vacancy.keySkills : vacancy.keySkills?.slice(0, 5)) ?? [];
   const hiddenSkillsCount = (vacancy.keySkills?.length ?? 0) - 5;
 
   return (

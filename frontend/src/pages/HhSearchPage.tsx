@@ -7,33 +7,13 @@ import { Loading } from '@/components/Common/Loading';
 import { Pagination } from '@/components/Common/Pagination';
 import { useHhSearch, useHhVacancyDetails } from '@/hooks/useHhSearch';
 
-interface HhVacancy {
-  id: string;
-  name: string;
-  salary?: { from?: number; to?: number; currency: string };
-  employer: { name: string };
-  area: { name: string };
-  url: string;
-}
-
-interface HhVacancyDetail {
-  id: string;
-  name: string;
-  description?: string;
-  employer: { name: string };
-  salary?: { from?: number; to?: number; currency: string };
-  key_skills?: Array<{ name: string }>;
-  area: { name: string };
-  url: string;
-}
-
 export const HhSearchPage: FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedVacancyId, setSelectedVacancyId] = useState<string | null>(null);
 
-  const pageSize = 20;
+  const pageSize = 24;
 
   // Используем React Query для кеширования результатов поиска
   const {
@@ -111,7 +91,7 @@ export const HhSearchPage: FC = () => {
                   </p>
                 </div>
                 <div className="space-y-1 max-h-96 overflow-y-auto">
-                  {searchResults.map((vacancy) => (
+                  {searchResults.map((vacancy: any) => (
                     <button
                       key={vacancy.id}
                       onClick={() => setSelectedVacancyId(vacancy.id)}
@@ -217,7 +197,7 @@ export const HhSearchPage: FC = () => {
                           Навыки
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {vacancyDetails.key_skills.map((skill, idx) => (
+                          {vacancyDetails.key_skills.map((skill: any, idx: number) => (
                             <span
                               key={idx}
                               className="px-3 py-1 bg-primary bg-opacity-10 text-primary text-xs font-medium rounded-full"

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest, VacancyListResponse } from '@/types/vacancy';
+import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest, VacancyListResponse, ApproveSkillRequest, ApproveSkillResponse, SkillsOnReviewResponse, CleanSkillsResponse, ImportResult } from '@/types/vacancy';
 
 const API_BASE_URL = '/api';
 
@@ -69,9 +69,52 @@ export const vacancyAPI = {
 };
 
 export const importAPI = {
-  // Import vacancies from HeadHunter
-  async importVacancies(search: string): Promise<void> {
-    await apiClient.get('/vacancy/save', { params: { search } });
+  // Import vacancies from HeadHunter with optional filter
+  async importVacancies(search: string, vacancyNameFilter?: string): Promise<ImportResult> {
+    const params: Record<string, string> = { search };
+    if (vacancyNameFilter) params.vacancyNameFilter = vacancyNameFilter;
+    const response = await apiClient.get<ImportResult>('/vacancy/save', { params });
+    return response.data;
+  },
+};
+
+export const skillsAPI = {
+  // Get skills on review
+  async getOnReview(): Promise<SkillsOnReviewResponse> {
+    const response = await apiClient.get<SkillsOnReviewResponse>('/skills/on-review');
+    return response.data;
+  },
+
+  // Get clean (verified) skills
+  async getClean(): Promise<CleanSkillsResponse> {
+    const response = await apiClient.get<CleanSkillsResponse>('/skills/clean');
+    return response.data;
+  },
+
+  // Import skills from unprocessed vacancies
+  async importSkills(vacancyNameFilter?: string, limit?: number): Promise<ImportResult> {
+    const params: Record<string, string | number> = {};
+    if (vacancyNameFilter) params.vacancyNameFilter = vacancyNameFilter;
+    if (limit) params.limit = limit;
+    const response = await apiClient.post<ImportResult>('/skills/import-from-vacancies', {}, { params });
+    return response.data;
+  },
+
+  // Approve a skill on review
+  async approveSkill(skillId: string, request: ApproveSkillRequest): Promise<ApproveSkillResponse> {
+    const response = await apiClient.post<ApproveSkillResponse>(`/skills/on-review/${skillId}/approve`, request);
+    return response.data;
+  },
+
+  // Reject a skill on review
+  async rejectSkill(skillId: string): Promise<void> {
+    await apiClient.post(`/skills/on-review/${skillId}/reject`);
+  },
+
+  // Add a new clean skill
+  async addCleanSkill(data: { displayName: string; description?: string; normalizedName?: string }): Promise<any> {
+    const response = await apiClient.post('/skills/clean/add', data);
+    return response.data;
   },
 };
 

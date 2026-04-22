@@ -1,7 +1,6 @@
-import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { vacancyAPI } from '@/services/api';
-import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest } from '@/types/vacancy';
+import { CreateVacancyRequest, UpdateVacancyRequest } from '@/types/vacancy';
 
 export function useVacancies(page: number = 1, pageSize: number = 10, search?: string, skillFilter?: string) {
   const queryClient = useQueryClient();
@@ -39,7 +38,7 @@ export function useVacancies(page: number = 1, pageSize: number = 10, search?: s
   // Delete vacancy mutation
   const deleteMutation = useMutation({
     mutationFn: (id: string) => vacancyAPI.delete(id),
-    onSuccess: (_, deletedId) => {
+    onSuccess: () => {
       // Инвалидировать все vacancies queries чтобы они перезагрузились
       queryClient.invalidateQueries({ queryKey: ['vacancies'] });
     },

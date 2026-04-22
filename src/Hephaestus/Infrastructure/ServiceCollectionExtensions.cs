@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Hephaestus.Features.HeadHunterClient;
+using Hephaestus.Features.SkillManagement;
 using Hephaestus.Features.VacancySaver;
 
 namespace Hephaestus.Infrastructure;
@@ -11,9 +12,12 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         ConfigureClients(services, configuration);
-        
+
         services.AddScoped<IVacancySaver, VacancySaver>();
-        
+        services.AddScoped<ISkillNormalizationService, SkillNormalizationService>();
+        services.AddScoped<ISkillImportService, SkillImportService>();
+        services.AddScoped<ISkillVerificationService, SkillVerificationService>();
+
         return services;
     }
 

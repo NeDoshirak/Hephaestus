@@ -1,20 +1,18 @@
 import { FC } from 'react';
 import { NavLink } from 'react-router-dom';
-import { List, Download } from 'lucide-react';
+import { Home, List, CheckCircle, Zap, Globe } from 'lucide-react';
 
 interface SidebarProps {
   logo?: string;
 }
 
-const HhIcon = () => (
-  <span className="font-bold text-lg">HH</span>
-);
-
 export const Sidebar: FC<SidebarProps> = ({ logo }) => {
   const navItems = [
+    { path: '/', label: 'Главная', icon: Home },
     { path: '/vacancies', label: 'Вакансии', icon: List },
-    { path: '/hh-search', label: 'Поиск на HH', icon: HhIcon },
-    { path: '/import', label: 'Загрузить с HH', icon: Download },
+    { path: '/skills-review', label: 'Верификация навыков', icon: CheckCircle },
+    { path: '/skills', label: 'Верифицированные навыки', icon: Zap },
+    { path: '/hh-search', label: 'Поиск на HH', icon: Globe },
   ];
 
   return (
@@ -34,7 +32,7 @@ export const Sidebar: FC<SidebarProps> = ({ logo }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-1.5">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -42,15 +40,15 @@ export const Sidebar: FC<SidebarProps> = ({ logo }) => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                `flex items-center gap-3 px-4 py-3.5 rounded-lg transition-all duration-200 font-medium ${
                   isActive
-                    ? 'bg-primary text-dark font-semibold shadow-md'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                    ? 'bg-primary text-dark shadow-md'
+                    : 'text-gray-200 hover:bg-gray-700 hover:text-white'
                 }`
               }
             >
-              <Icon size={20} />
-              <span>{item.label}</span>
+              <Icon size={20} className="flex-shrink-0" />
+              <span className="text-sm">{item.label}</span>
             </NavLink>
           );
         })}

@@ -16,7 +16,7 @@ import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest } from '@/types/
 
 export const VacanciesPage: FC = () => {
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(24);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [skillFilter, setSkillFilter] = useState('');
