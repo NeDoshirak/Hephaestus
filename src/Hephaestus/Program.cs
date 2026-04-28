@@ -47,4 +47,28 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Open Swagger UI in browser on startup in Development mode
+if (app.Environment.IsDevelopment())
+{
+    app.Lifetime.ApplicationStarted.Register(async () =>
+    {
+        await Task.Delay(500);
+        var url = app.Urls.FirstOrDefault() ?? "https://localhost:7168";
+        var swaggerUrl = $"{url}/swagger/index.html";
+
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = swaggerUrl,
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // Browser opening failed silently
+        }
+    });
+}
+
 app.Run();
