@@ -116,8 +116,15 @@ export function useAddCleanSkill() {
   const [successMessage, setSuccessMessage] = useState<string>('');
 
   const addMutation = useMutation({
-    mutationFn: (data: { displayName: string; description?: string; normalizedName?: string }) =>
-      skillsAPI.addCleanSkill(data),
+    mutationFn: (data: {
+      displayName: string;
+      description?: string;
+      normalizedName?: string;
+      skillType?: string;
+      direction?: string;
+      level?: string;
+      professionId?: string;
+    }) => skillsAPI.addCleanSkill(data),
     onSuccess: (data) => {
       setSuccessMessage(`Навык "${data.displayName}" успешно добавлен!`);
       queryClient.invalidateQueries({ queryKey: ['cleanSkills'] });

@@ -7,6 +7,10 @@ public class CleanSkillDto
     public string DisplayName { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int Counter { get; set; }
+    public string? SkillType { get; set; }
+    public string? Direction { get; set; }
+    public string? Level { get; set; }
+    public Guid? ProfessionId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public List<SkillSynonymDto> Synonyms { get; set; } = new();
@@ -47,4 +51,8 @@ public class AddCleanSkillRequest
     public string DisplayName { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? NormalizedName { get; set; }
+    public string? SkillType { get; set; }
+    public string? Direction { get; set; }
+    public string? Level { get; set; }
+    public Guid? ProfessionId { get; set; }
 }

@@ -5,6 +5,7 @@ import { VacanciesPage } from '@/pages/VacanciesPage';
 import { SkillsReviewPage } from '@/pages/SkillsReviewPage';
 import { CleanSkillsPage } from '@/pages/CleanSkillsPage';
 import { HhSearchPage } from '@/pages/HhSearchPage';
+import { ProfessionsPage } from '@/pages/ProfessionsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/skills-review" element={<SkillsReviewPage />} />
           <Route path="/skills" element={<CleanSkillsPage />} />
           <Route path="/hh-search" element={<HhSearchPage />} />
+          <Route path="/professions" element={<ProfessionsPage />} />
         </Routes>
       </Router>
     </QueryClientProvider>

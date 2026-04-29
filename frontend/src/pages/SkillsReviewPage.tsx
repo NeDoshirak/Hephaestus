@@ -1,10 +1,15 @@
 import { FC, useState } from 'react';
-import { CheckCircle, AlertCircle, Trash2, Edit2, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, AlertCircle, Trash2, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { Layout } from '@/components/Layout/Layout';
 import { Button } from '@/components/Common/Button';
 import { Input } from '@/components/Common/Input';
 import { Loading } from '@/components/Common/Loading';
+import { SkillTypeSelect } from '@/components/Common/SkillTypeSelect';
+import { DirectionSelect } from '@/components/Common/DirectionSelect';
+import { SkillLevelSelect } from '@/components/Common/SkillLevelSelect';
+import { ProfessionSelect } from '@/components/Common/ProfessionSelect';
 import { useSkillsOnReview, useApproveSkill, useRejectSkill, useCleanSkills } from '@/hooks/useSkills';
+import { SkillType, Direction, SkillLevel } from '@/types/vacancy';
 
 type ApprovalMode = 'new' | 'synonym' | 'dependency';
 
@@ -19,6 +24,10 @@ export const SkillsReviewPage: FC = () => {
   const [approvalMode, setApprovalMode] = useState<ApprovalMode>('new');
   const [displayName, setDisplayName] = useState('');
   const [description, setDescription] = useState('');
+  const [skillType, setSkillType] = useState<SkillType | undefined>();
+  const [direction, setDirection] = useState<Direction | undefined>();
+  const [level, setLevel] = useState<SkillLevel | undefined>();
+  const [professionId, setProfessionId] = useState<string | undefined>();
   const [selectedExistingSkill, setSelectedExistingSkill] = useState<string | null>(null);
   const [existingSkillSearch, setExistingSkillSearch] = useState('');
   const [selectedDependency, setSelectedDependency] = useState<string | null>(null);
@@ -29,17 +38,16 @@ export const SkillsReviewPage: FC = () => {
     skill.normalizedName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredExistingSkills = cleanSkills.filter((skill) =>
-    skill.displayName.toLowerCase().includes(existingSkillSearch.toLowerCase()) ||
-    skill.normalizedName.toLowerCase().includes(existingSkillSearch.toLowerCase())
-  );
-
   const successMessage = approveMessage || rejectMessage;
 
   const handleOpenModal = (skill: any) => {
     setSelectedSkill(skill);
     setDisplayName(skill.suggestedDisplayName);
     setDescription('');
+    setSkillType(skill.skillType);
+    setDirection(skill.direction);
+    setLevel(skill.level);
+    setProfessionId(skill.professionId);
     setApprovalMode('new');
     setSelectedExistingSkill(null);
     setExistingSkillSearch('');
@@ -51,6 +59,10 @@ export const SkillsReviewPage: FC = () => {
     setSelectedSkill(null);
     setDisplayName('');
     setDescription('');
+    setSkillType(undefined);
+    setDirection(undefined);
+    setLevel(undefined);
+    setProfessionId(undefined);
     setApprovalMode('new');
     setSelectedExistingSkill(null);
     setExistingSkillSearch('');
@@ -70,6 +82,10 @@ export const SkillsReviewPage: FC = () => {
           description: description.trim() || undefined,
           synonyms: [],
           children: [],
+          skillType: skillType?.toString(),
+          direction: direction?.toString(),
+          level: level?.toString(),
+          professionId,
         },
       });
     } else if (approvalMode === 'synonym' && selectedExistingSkill) {
@@ -81,6 +97,10 @@ export const SkillsReviewPage: FC = () => {
           synonyms: [],
           children: [],
           existingCleanSkillId: selectedExistingSkill,
+          skillType: skillType?.toString(),
+          direction: direction?.toString(),
+          level: level?.toString(),
+          professionId,
         },
       });
     } else if (approvalMode === 'dependency') {
@@ -99,6 +119,10 @@ export const SkillsReviewPage: FC = () => {
               relationType: 'is_variant',
             },
           ],
+          skillType: skillType?.toString(),
+          direction: direction?.toString(),
+          level: level?.toString(),
+          professionId,
         },
       });
     }
@@ -309,6 +333,31 @@ export const SkillsReviewPage: FC = () => {
                           />
                         </div>
 
+                        {(selectedSkill?.skillType || selectedSkill?.direction || selectedSkill?.level || selectedSkill?.professionId) && (
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+                            <div className="font-medium text-blue-900 mb-2">📋 Предложенные системой атрибуты:</div>
+                            <div className="space-y-1 text-blue-800 text-xs">
+                              {selectedSkill?.skillType && <div>Тип: <span className="font-semibold">{selectedSkill.skillType}</span></div>}
+                              {selectedSkill?.direction && <div>Направление: <span className="font-semibold">{selectedSkill.direction}</span></div>}
+                              {selectedSkill?.level && <div>Уровень: <span className="font-semibold">{selectedSkill.level}</span></div>}
+                              {selectedSkill?.professionId && <div>Профессия ID: <span className="font-semibold">{selectedSkill.professionId.substring(0, 8)}...</span></div>}
+                            </div>
+                          </div>
+                        )}
+
+                        <div>
+                          <label className="block text-sm font-medium text-dark mb-2">Атрибуты навыка</label>
+                          <div className="grid grid-cols-2 gap-4">
+                            <SkillTypeSelect value={skillType} onChange={setSkillType} />
+                            <DirectionSelect value={direction} onChange={setDirection} />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <SkillLevelSelect value={level} onChange={setLevel} />
+                          <ProfessionSelect value={professionId} onChange={setProfessionId} label="Профессия" />
+                        </div>
+
                         {approvalMode === 'dependency' && (
                           <div>
                             <label className="block text-sm font-medium text-dark mb-2">
@@ -375,6 +424,18 @@ export const SkillsReviewPage: FC = () => {
                       </div>
                     ) : (
                       <div className="space-y-4 bg-white p-4 rounded-lg">
+                        {(selectedSkill?.skillType || selectedSkill?.direction || selectedSkill?.level || selectedSkill?.professionId) && (
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+                            <div className="font-medium text-blue-900 mb-2">📋 Предложенные системой атрибуты:</div>
+                            <div className="space-y-1 text-blue-800 text-xs">
+                              {selectedSkill?.skillType && <div>Тип: <span className="font-semibold">{selectedSkill.skillType}</span></div>}
+                              {selectedSkill?.direction && <div>Направление: <span className="font-semibold">{selectedSkill.direction}</span></div>}
+                              {selectedSkill?.level && <div>Уровень: <span className="font-semibold">{selectedSkill.level}</span></div>}
+                              {selectedSkill?.professionId && <div>Профессия ID: <span className="font-semibold">{selectedSkill.professionId.substring(0, 8)}...</span></div>}
+                            </div>
+                          </div>
+                        )}
+
                         <div>
                           <label className="block text-sm font-medium text-dark mb-2">
                             Поиск существующего навыка

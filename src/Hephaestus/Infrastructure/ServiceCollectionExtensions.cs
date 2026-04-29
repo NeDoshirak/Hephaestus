@@ -3,6 +3,8 @@ using Hephaestus.Features.GroqClient;
 using Hephaestus.Features.HeadHunterClient;
 using Hephaestus.Features.OpenAiClients;
 using Hephaestus.Features.OpenRouterClient;
+using Hephaestus.Features.ProfessionsManagement.Interfaces;
+using Hephaestus.Features.ProfessionsManagement.Services;
 using Hephaestus.Features.SkillManagement;
 using Hephaestus.Features.VacancySaver;
 
@@ -20,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISkillNormalizationService, SkillNormalizationService>();
         services.AddScoped<ISkillImportService, SkillImportService>();
         services.AddScoped<ISkillVerificationService, SkillVerificationService>();
+        services.AddScoped<IProfessionService, ProfessionService>();
 
         return services;
     }

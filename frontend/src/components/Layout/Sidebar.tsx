@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, List, CheckCircle, Zap, Globe } from 'lucide-react';
+import { Home, List, CheckCircle, Zap, Globe, Briefcase } from 'lucide-react';
 
 interface SidebarProps {
   logo?: string;
@@ -12,6 +12,7 @@ export const Sidebar: FC<SidebarProps> = ({ logo }) => {
     { path: '/vacancies', label: 'Вакансии', icon: List },
     { path: '/skills-review', label: 'Верификация навыков', icon: CheckCircle },
     { path: '/skills', label: 'Верифицированные навыки', icon: Zap },
+    { path: '/professions', label: 'Профессии', icon: Briefcase },
     { path: '/hh-search', label: 'Поиск на HH', icon: Globe },
   ];
 

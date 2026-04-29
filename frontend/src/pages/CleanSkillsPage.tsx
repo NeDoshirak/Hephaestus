@@ -5,7 +5,12 @@ import { Button } from '@/components/Common/Button';
 import { Input } from '@/components/Common/Input';
 import { Loading } from '@/components/Common/Loading';
 import { Modal } from '@/components/Common/Modal';
+import { SkillTypeSelect } from '@/components/Common/SkillTypeSelect';
+import { DirectionSelect } from '@/components/Common/DirectionSelect';
+import { SkillLevelSelect } from '@/components/Common/SkillLevelSelect';
+import { ProfessionSelect } from '@/components/Common/ProfessionSelect';
 import { useCleanSkills, useAddCleanSkill } from '@/hooks/useSkills';
+import { SkillType, Direction, SkillLevel } from '@/types/vacancy';
 
 type RelationshipFilter = 'all' | 'dependent' | 'parent';
 
@@ -17,6 +22,10 @@ export const CleanSkillsPage: FC = () => {
   const [displayName, setDisplayName] = useState('');
   const [description, setDescription] = useState('');
   const [normalizedName, setNormalizedName] = useState('');
+  const [skillType, setSkillType] = useState<SkillType | undefined>();
+  const [direction, setDirection] = useState<Direction | undefined>();
+  const [level, setLevel] = useState<SkillLevel | undefined>();
+  const [professionId, setProfessionId] = useState<string | undefined>();
   const [relationshipFilter, setRelationshipFilter] = useState<RelationshipFilter>('all');
 
   const filteredSkills = skills.filter((skill) => {
@@ -39,10 +48,18 @@ export const CleanSkillsPage: FC = () => {
       displayName: displayName.trim(),
       description: description.trim() || undefined,
       normalizedName: normalizedName.trim() || undefined,
+      skillType: skillType?.toString(),
+      direction: direction?.toString(),
+      level: level?.toString(),
+      professionId,
     });
     setDisplayName('');
     setDescription('');
     setNormalizedName('');
+    setSkillType(undefined);
+    setDirection(undefined);
+    setLevel(undefined);
+    setProfessionId(undefined);
     setIsModalOpen(false);
   };
 
@@ -197,6 +214,44 @@ export const CleanSkillsPage: FC = () => {
                       </span>
                     </div>
 
+                    {/* Skill Attributes */}
+                    {(skill.skillType || skill.direction || skill.level || skill.professionId) && (
+                      <div className="mb-4 space-y-2">
+                        {skill.skillType && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-600">Тип: </span>
+                            <span className="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                              {skill.skillType}
+                            </span>
+                          </div>
+                        )}
+                        {skill.direction && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-600">Направление: </span>
+                            <span className="inline-block bg-cyan-100 text-cyan-800 px-2 py-1 rounded">
+                              {skill.direction}
+                            </span>
+                          </div>
+                        )}
+                        {skill.level && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-600">Уровень: </span>
+                            <span className="inline-block bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+                              {skill.level}
+                            </span>
+                          </div>
+                        )}
+                        {skill.professionId && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-600">Профессия: </span>
+                            <span className="inline-block bg-pink-100 text-pink-800 px-2 py-1 rounded">
+                              ID: {skill.professionId.substring(0, 8)}...
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Synonyms */}
                     {skill.synonyms && skill.synonyms.length > 0 && (
                       <div className="mb-4">
@@ -299,6 +354,10 @@ export const CleanSkillsPage: FC = () => {
             setDisplayName('');
             setDescription('');
             setNormalizedName('');
+            setSkillType(undefined);
+            setDirection(undefined);
+            setLevel(undefined);
+            setProfessionId(undefined);
           }}
         >
           <div className="space-y-4">
@@ -329,6 +388,16 @@ export const CleanSkillsPage: FC = () => {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <SkillTypeSelect value={skillType} onChange={setSkillType} />
+              <DirectionSelect value={direction} onChange={setDirection} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <SkillLevelSelect value={level} onChange={setLevel} />
+              <ProfessionSelect value={professionId} onChange={setProfessionId} label="Профессия" />
+            </div>
+
             <div className="flex gap-3 pt-4">
               <Button
                 onClick={handleAddSkill}
@@ -345,6 +414,10 @@ export const CleanSkillsPage: FC = () => {
                   setDisplayName('');
                   setDescription('');
                   setNormalizedName('');
+                  setSkillType(undefined);
+                  setDirection(undefined);
+                  setLevel(undefined);
+                  setProfessionId(undefined);
                 }}
                 disabled={isAdding}
                 variant="secondary"

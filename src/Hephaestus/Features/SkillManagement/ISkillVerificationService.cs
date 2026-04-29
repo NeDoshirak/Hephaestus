@@ -12,6 +12,10 @@ public class ApproveSkillRequest
     public List<string> Synonyms { get; set; } = new();
     public List<ChildSkillRelation> Children { get; set; } = new();
     public Guid? ExistingCleanSkillId { get; set; }
+    public string? SkillType { get; set; }
+    public string? Direction { get; set; }
+    public string? Level { get; set; }
+    public Guid? ProfessionId { get; set; }
 }
 
 public class ChildSkillRelation
@@ -25,5 +29,9 @@ public class ApproveSkillResult
     public Guid CleanSkillId { get; set; }
     public string NormalizedName { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
+    public string? SkillType { get; set; }
+    public string? Direction { get; set; }
+    public string? Level { get; set; }
+    public Guid? ProfessionId { get; set; }
     public int DuplicatesProcessed { get; set; }
 }

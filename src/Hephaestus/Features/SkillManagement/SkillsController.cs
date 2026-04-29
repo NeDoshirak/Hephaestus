@@ -1,5 +1,6 @@
 using Hephaestus.Application;
 using Hephaestus.Domain.Entities;
+using Hephaestus.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -86,7 +87,11 @@ public class SkillsController(
             NormalizedName = normalizedName,
             DisplayName = request.DisplayName,
             Description = request.Description,
-            Counter = 1
+            Counter = 1,
+            SkillType = !string.IsNullOrEmpty(request.SkillType) && Enum.TryParse<SkillType>(request.SkillType, true, out var skillType) ? skillType : null,
+            Direction = !string.IsNullOrEmpty(request.Direction) && Enum.TryParse<Direction>(request.Direction, true, out var direction) ? direction : null,
+            Level = !string.IsNullOrEmpty(request.Level) && Enum.TryParse<SkillLevel>(request.Level, true, out var level) ? level : null,
+            ProfessionId = request.ProfessionId
         };
 
         await dbContext.CleanSkills.AddAsync(cleanSkill);
@@ -99,6 +104,10 @@ public class SkillsController(
             DisplayName = cleanSkill.DisplayName,
             Description = cleanSkill.Description,
             Counter = cleanSkill.Counter,
+            SkillType = cleanSkill.SkillType?.ToString(),
+            Direction = cleanSkill.Direction?.ToString(),
+            Level = cleanSkill.Level?.ToString(),
+            ProfessionId = cleanSkill.ProfessionId,
             CreatedAt = cleanSkill.CreatedAt,
             UpdatedAt = cleanSkill.UpdatedAt,
             Synonyms = new(),
@@ -126,6 +135,10 @@ public class SkillsController(
             DisplayName = s.DisplayName,
             Description = s.Description,
             Counter = s.Counter,
+            SkillType = s.SkillType?.ToString(),
+            Direction = s.Direction?.ToString(),
+            Level = s.Level?.ToString(),
+            ProfessionId = s.ProfessionId,
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt,
             Synonyms = s.Synonyms.Select(syn => new SkillSynonymDto

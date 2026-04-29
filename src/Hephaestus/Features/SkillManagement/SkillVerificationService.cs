@@ -1,5 +1,6 @@
 using Hephaestus.Application;
 using Hephaestus.Domain.Entities;
+using Hephaestus.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hephaestus.Features.SkillManagement;
@@ -46,7 +47,11 @@ public class SkillVerificationService(
                     NormalizedName = skillOnReview.NormalizedName,
                     DisplayName = request.DisplayName,
                     Description = request.Description,
-                    Counter = skillOnReview.Counter
+                    Counter = skillOnReview.Counter,
+                    SkillType = !string.IsNullOrEmpty(request.SkillType) && Enum.TryParse<SkillType>(request.SkillType, true, out var skillType) ? skillType : null,
+                    Direction = !string.IsNullOrEmpty(request.Direction) && Enum.TryParse<Direction>(request.Direction, true, out var direction) ? direction : null,
+                    Level = !string.IsNullOrEmpty(request.Level) && Enum.TryParse<SkillLevel>(request.Level, true, out var level) ? level : null,
+                    ProfessionId = request.ProfessionId
                 };
 
                 await dbContext.CleanSkills.AddAsync(cleanSkill);
@@ -103,6 +108,10 @@ public class SkillVerificationService(
                 CleanSkillId = cleanSkill.Id,
                 NormalizedName = cleanSkill.NormalizedName,
                 DisplayName = cleanSkill.DisplayName,
+                SkillType = cleanSkill.SkillType?.ToString(),
+                Direction = cleanSkill.Direction?.ToString(),
+                Level = cleanSkill.Level?.ToString(),
+                ProfessionId = cleanSkill.ProfessionId,
                 DuplicatesProcessed = duplicatesProcessed
             };
         }

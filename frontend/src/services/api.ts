@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest, VacancyListResponse, ApproveSkillRequest, ApproveSkillResponse, SkillsOnReviewResponse, CleanSkillsResponse, ImportResult } from '@/types/vacancy';
+import { RawVacancy, CreateVacancyRequest, UpdateVacancyRequest, VacancyListResponse, ApproveSkillRequest, ApproveSkillResponse, SkillsOnReviewResponse, CleanSkillsResponse, ImportResult, Profession, ProfessionDirection } from '@/types/vacancy';
 
 const API_BASE_URL = '/api';
 
@@ -112,7 +112,15 @@ export const skillsAPI = {
   },
 
   // Add a new clean skill
-  async addCleanSkill(data: { displayName: string; description?: string; normalizedName?: string }): Promise<any> {
+  async addCleanSkill(data: {
+    displayName: string;
+    description?: string;
+    normalizedName?: string;
+    skillType?: string;
+    direction?: string;
+    level?: string;
+    professionId?: string;
+  }): Promise<any> {
     const response = await apiClient.post('/skills/clean/add', data);
     return response.data;
   },
@@ -131,6 +139,37 @@ export const hhAPI = {
   async getVacancyDetails(vacancyId: string) {
     const response = await apiClient.get(`/hh/vacancies/${vacancyId}`);
     return response.data;
+  },
+};
+
+export const professionsAPI = {
+  // Get all professions
+  async getAll(): Promise<Profession[]> {
+    const response = await apiClient.get<Profession[]>('/professions');
+    return response.data;
+  },
+
+  // Get profession by ID
+  async getById(id: string): Promise<Profession> {
+    const response = await apiClient.get<Profession>(`/professions/${id}`);
+    return response.data;
+  },
+
+  // Create profession
+  async create(data: { name: string; description?: string; direction: ProfessionDirection }): Promise<Profession> {
+    const response = await apiClient.post<Profession>('/professions', data);
+    return response.data;
+  },
+
+  // Update profession
+  async update(id: string, data: { name: string; description?: string; direction: ProfessionDirection }): Promise<Profession> {
+    const response = await apiClient.put<Profession>(`/professions/${id}`, data);
+    return response.data;
+  },
+
+  // Delete profession
+  async delete(id: string): Promise<void> {
+    await apiClient.delete(`/professions/${id}`);
   },
 };
 

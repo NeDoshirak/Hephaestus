@@ -1,3 +1,44 @@
+// Enums
+export enum SkillType {
+  Soft = 'Soft',
+  Hard = 'Hard',
+  Tool = 'Tool',
+  Framework = 'Framework',
+  Language = 'Language',
+  DomainKnowledge = 'DomainKnowledge',
+}
+
+export enum Direction {
+  Programming = 'Programming',
+  Analytics = 'Analytics',
+  Testing = 'Testing',
+  Design = 'Design',
+  DevOps = 'DevOps',
+  DataScience = 'DataScience',
+  Management = 'Management',
+  General = 'General',
+}
+
+export enum SkillLevel {
+  Intern = 1,
+  Junior = 2,
+  JuniorPlus = 3,
+  Middle = 4,
+  MiddlePlus = 5,
+  Senior = 6,
+  LeadExpert = 7,
+}
+
+export enum ProfessionDirection {
+  Programming = 'Programming',
+  Analytics = 'Analytics',
+  Testing = 'Testing',
+  Design = 'Design',
+  DevOps = 'DevOps',
+  DataScience = 'DataScience',
+  Management = 'Management',
+}
+
 export interface KeySkill {
   id: string;
   name: string;
@@ -40,6 +81,10 @@ export interface SkillOnReview {
   counter: number;
   status: string;
   suggestedDisplayName: string;
+  skillType?: SkillType;
+  direction?: Direction;
+  level?: SkillLevel;
+  professionId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,22 +103,46 @@ export interface CleanSkill {
   displayName: string;
   description?: string;
   counter: number;
+  skillType?: SkillType;
+  direction?: Direction;
+  level?: SkillLevel;
+  professionId?: string;
   createdAt: string;
   updatedAt: string;
   synonyms: SkillSynonym[];
+  dependentSkills?: CleanSkill[];
+  parentSkills?: CleanSkill[];
+}
+
+export interface Profession {
+  id: string;
+  name: string;
+  description?: string;
+  direction: ProfessionDirection;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ApproveSkillRequest {
   displayName: string;
   description?: string;
   synonyms: string[];
-  children: { childNormalizedName: string; relationType: string }[];
+  children: { childNormalizedName?: string; parentNormalizedName?: string; relationType: string }[];
+  skillType?: string;
+  direction?: string;
+  level?: string;
+  professionId?: string;
+  existingCleanSkillId?: string;
 }
 
 export interface ApproveSkillResponse {
   cleanSkillId: string;
   normalizedName: string;
   displayName: string;
+  skillType?: string;
+  direction?: string;
+  level?: string;
+  professionId?: string;
   duplicatesProcessed: number;
 }
 
