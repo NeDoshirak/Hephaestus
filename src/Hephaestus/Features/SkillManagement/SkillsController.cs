@@ -1,6 +1,8 @@
 using Hephaestus.Application;
 using Hephaestus.Domain.Entities;
 using Hephaestus.Domain.Enums;
+using Hephaestus.Features.OpenAiClients;
+using Hephaestus.Features.OpenRouterClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +14,9 @@ public class SkillsController(
     ISkillImportService importService,
     ISkillVerificationService verificationService,
     ISkillNormalizationService normalizationService,
-    AppDbContext dbContext) : ControllerBase
+    AppDbContext dbContext,
+    IOpenRouterClient openRouterClient,
+    ILogger<SkillsController> logger) : ControllerBase
 {
     [HttpPost("import-from-vacancies")]
     public async Task<IActionResult> ImportFromVacancies(
@@ -39,11 +43,56 @@ public class SkillsController(
             Counter = s.Counter,
             Status = s.Status,
             SuggestedDisplayName = s.SuggestedDisplayName,
+            SkillType = s.SkillType?.ToString(),
+            Direction = s.Direction?.ToString(),
+            Level = s.Level?.ToString(),
+            ProfessionId = s.ProfessionId,
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt
         }).ToList();
 
         return Ok(new { items = dtos });
+    }
+
+    [HttpGet("generate-description")]
+    public async Task<IActionResult> GenerateDescription([FromQuery] string skillName)
+    {
+        if (string.IsNullOrWhiteSpace(skillName))
+            return BadRequest("Skill name is required");
+
+        try
+        {
+            var systemPrompt = """
+                Ты эксперт в области разработки программного обеспечения и описания технических навыков.
+                Напиши краткое и информативное описание навыка на русском языке.
+                Описание должно быть 1-2 предложениями, информативным и понятным.
+                Используй простой язык.
+                """;
+
+            var userPrompt = $"Напиши описание для навыка: {skillName}";
+
+            var messages = new List<ChatMessage>
+            {
+                new() { Role = "system", Content = systemPrompt },
+                new() { Role = "user", Content = userPrompt }
+            };
+
+            var response = await openRouterClient.CreateChatCompletionAsync(
+                "openai/gpt-oss-120b:free",
+                messages,
+                maxTokens: 256,
+                temperature: 0.7
+            );
+
+            var description = response.Choices.FirstOrDefault()?.Message.Content ?? string.Empty;
+
+            return Ok(new { description = description.Trim() });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error generating description for skill: {SkillName}", skillName);
+            return StatusCode(500, new { error = "Failed to generate description" });
+        }
     }
 
     [HttpPost("on-review/{id}/approve")]
@@ -108,6 +157,7 @@ public class SkillsController(
             Direction = cleanSkill.Direction?.ToString(),
             Level = cleanSkill.Level?.ToString(),
             ProfessionId = cleanSkill.ProfessionId,
+            ProfessionName = cleanSkill.Profession?.Name,
             CreatedAt = cleanSkill.CreatedAt,
             UpdatedAt = cleanSkill.UpdatedAt,
             Synonyms = new(),
@@ -121,6 +171,7 @@ public class SkillsController(
     {
         var skills = await dbContext.CleanSkills
             .Include(c => c.Synonyms)
+            .Include(c => c.Profession)
             .Include(c => c.ParentRelations)
             .ThenInclude(r => r.ChildSkill)
             .Include(c => c.ChildRelations)
@@ -139,6 +190,7 @@ public class SkillsController(
             Direction = s.Direction?.ToString(),
             Level = s.Level?.ToString(),
             ProfessionId = s.ProfessionId,
+            ProfessionName = s.Profession?.Name,
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt,
             Synonyms = s.Synonyms.Select(syn => new SkillSynonymDto

@@ -27,6 +27,7 @@ export const CleanSkillsPage: FC = () => {
   const [level, setLevel] = useState<SkillLevel | undefined>();
   const [professionId, setProfessionId] = useState<string | undefined>();
   const [relationshipFilter, setRelationshipFilter] = useState<RelationshipFilter>('all');
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
 
   const filteredSkills = skills.filter((skill) => {
     const matchesSearch =
@@ -41,6 +42,18 @@ export const CleanSkillsPage: FC = () => {
 
     return true;
   });
+
+  const toggleDescription = (skillId: string) => {
+    setExpandedDescriptions((prev) => {
+      const next = new Set(prev);
+      if (next.has(skillId)) {
+        next.delete(skillId);
+      } else {
+        next.add(skillId);
+      }
+      return next;
+    });
+  };
 
   const handleAddSkill = () => {
     if (!displayName.trim()) return;
@@ -199,9 +212,19 @@ export const CleanSkillsPage: FC = () => {
                       <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
                         <div className="flex items-start gap-2">
                           <FileText size={14} className="text-blue-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-gray-700 line-clamp-3">
-                            {skill.description}
-                          </p>
+                          <div className="flex-1">
+                            <p className={`text-sm text-gray-700 ${expandedDescriptions.has(skill.id) ? '' : 'line-clamp-3'}`}>
+                              {skill.description}
+                            </p>
+                            {skill.description.split('\n').length > 1 || skill.description.length > 150 ? (
+                              <button
+                                onClick={() => toggleDescription(skill.id)}
+                                className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                              >
+                                {expandedDescriptions.has(skill.id) ? 'Свернуть' : 'Развернуть'}
+                              </button>
+                            ) : null}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -245,7 +268,7 @@ export const CleanSkillsPage: FC = () => {
                           <div className="text-xs">
                             <span className="font-medium text-gray-600">Профессия: </span>
                             <span className="inline-block bg-pink-100 text-pink-800 px-2 py-1 rounded">
-                              ID: {skill.professionId.substring(0, 8)}...
+                              {skill.professionName || `ID: ${skill.professionId.substring(0, 8)}...`}
                             </span>
                           </div>
                         )}

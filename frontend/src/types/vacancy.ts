@@ -20,13 +20,10 @@ export enum Direction {
 }
 
 export enum SkillLevel {
-  Intern = 1,
-  Junior = 2,
-  JuniorPlus = 3,
-  Middle = 4,
-  MiddlePlus = 5,
-  Senior = 6,
-  LeadExpert = 7,
+  Junior = 1,
+  Middle = 2,
+  Senior = 3,
+  Lead = 4,
 }
 
 export enum ProfessionDirection {
@@ -107,6 +104,7 @@ export interface CleanSkill {
   direction?: Direction;
   level?: SkillLevel;
   professionId?: string;
+  professionName?: string;
   createdAt: string;
   updatedAt: string;
   synonyms: SkillSynonym[];

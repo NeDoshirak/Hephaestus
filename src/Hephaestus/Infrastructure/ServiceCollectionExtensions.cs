@@ -7,6 +7,7 @@ using Hephaestus.Features.ProfessionsManagement.Interfaces;
 using Hephaestus.Features.ProfessionsManagement.Services;
 using Hephaestus.Features.SkillManagement;
 using Hephaestus.Features.VacancySaver;
+using Hephaestus.Features.VacancyAiParsing;
 
 namespace Hephaestus.Infrastructure;
 
@@ -23,6 +24,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISkillImportService, SkillImportService>();
         services.AddScoped<ISkillVerificationService, SkillVerificationService>();
         services.AddScoped<IProfessionService, ProfessionService>();
+        services.AddScoped<IVacancyAiParsingService, VacancyAiParsingService>();
+        services.AddScoped<IVacancyParsingPromptBuilder, VacancyParsingPromptBuilder>();
+        services.AddScoped<ISkillExtractionService, SkillExtractionService>();
+        services.AddScoped<ISkillClassificationService, SkillClassificationService>();
 
         return services;
     }
@@ -59,7 +64,7 @@ public static class ServiceCollectionExtensions
 
         services.AddHttpClient<IOpenAiHttpClient, OpenAiHttpClient>(client =>
         {
-            client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromSeconds(60);
         });
 
         services.AddScoped<IOpenRouterClient, OpenRouterClient>();

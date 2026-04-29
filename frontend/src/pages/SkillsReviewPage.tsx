@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { CheckCircle, AlertCircle, Trash2, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, AlertCircle, Trash2, Search, ChevronDown, ChevronUp, Wand2 } from 'lucide-react';
 import { Layout } from '@/components/Layout/Layout';
 import { Button } from '@/components/Common/Button';
 import { Input } from '@/components/Common/Input';
@@ -32,6 +32,7 @@ export const SkillsReviewPage: FC = () => {
   const [existingSkillSearch, setExistingSkillSearch] = useState('');
   const [selectedDependency, setSelectedDependency] = useState<string | null>(null);
   const [dependencySearch, setDependencySearch] = useState('');
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
 
   const filteredSkills = skills.filter((skill) =>
     skill.originalName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,14 +41,39 @@ export const SkillsReviewPage: FC = () => {
 
   const successMessage = approveMessage || rejectMessage;
 
+  const parseEnumValue = (value: any, enumObj: any): any => {
+    if (value === null || value === undefined || value === '') return undefined;
+
+    // If it's already a number, check if it's valid
+    if (typeof value === 'number' && Object.values(enumObj).includes(value)) {
+      return value;
+    }
+
+    // If it's a string that looks like a number, convert it
+    if (typeof value === 'string' && !isNaN(Number(value))) {
+      const numValue = Number(value);
+      if (Object.values(enumObj).includes(numValue)) {
+        return numValue;
+      }
+    }
+
+    // If it's a string (enum name), find its numeric value
+    if (typeof value === 'string' && enumObj[value] !== undefined) {
+      return enumObj[value];
+    }
+
+    return undefined;
+  };
+
   const handleOpenModal = (skill: any) => {
     setSelectedSkill(skill);
     setDisplayName(skill.suggestedDisplayName);
     setDescription('');
-    setSkillType(skill.skillType);
-    setDirection(skill.direction);
-    setLevel(skill.level);
-    setProfessionId(skill.professionId);
+    // Use AI-parsed values if available, otherwise undefined
+    setSkillType(parseEnumValue(skill.skillType, SkillType));
+    setDirection(parseEnumValue(skill.direction, Direction));
+    setLevel(parseEnumValue(skill.level, SkillLevel));
+    setProfessionId(skill.professionId || undefined);
     setApprovalMode('new');
     setSelectedExistingSkill(null);
     setExistingSkillSearch('');
@@ -132,6 +158,23 @@ export const SkillsReviewPage: FC = () => {
   const handleReject = (skillId: string) => {
     if (window.confirm('Вы уверены что хотите отклонить этот навык?')) {
       reject(skillId);
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!selectedSkill || !displayName.trim()) return;
+
+    setIsGeneratingDescription(true);
+    try {
+      const response = await fetch(`/api/skills/generate-description?skillName=${encodeURIComponent(displayName.trim())}`);
+      if (response.ok) {
+        const data = await response.json();
+        setDescription(data.description || '');
+      }
+    } catch (error) {
+      console.error('Failed to generate description:', error);
+    } finally {
+      setIsGeneratingDescription(false);
     }
   };
 
@@ -321,9 +364,21 @@ export const SkillsReviewPage: FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-dark mb-2">
-                            Описание (опционально)
-                          </label>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-dark">
+                              Описание (опционально)
+                            </label>
+                            <Button
+                              onClick={handleGenerateDescription}
+                              disabled={isGeneratingDescription || !displayName.trim()}
+                              size="sm"
+                              variant="secondary"
+                              className="gap-2"
+                            >
+                              <Wand2 size={16} />
+                              {isGeneratingDescription ? 'Генерирую...' : 'Сгенерировать'}
+                            </Button>
+                          </div>
                           <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -332,18 +387,6 @@ export const SkillsReviewPage: FC = () => {
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                           />
                         </div>
-
-                        {(selectedSkill?.skillType || selectedSkill?.direction || selectedSkill?.level || selectedSkill?.professionId) && (
-                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-                            <div className="font-medium text-blue-900 mb-2">📋 Предложенные системой атрибуты:</div>
-                            <div className="space-y-1 text-blue-800 text-xs">
-                              {selectedSkill?.skillType && <div>Тип: <span className="font-semibold">{selectedSkill.skillType}</span></div>}
-                              {selectedSkill?.direction && <div>Направление: <span className="font-semibold">{selectedSkill.direction}</span></div>}
-                              {selectedSkill?.level && <div>Уровень: <span className="font-semibold">{selectedSkill.level}</span></div>}
-                              {selectedSkill?.professionId && <div>Профессия ID: <span className="font-semibold">{selectedSkill.professionId.substring(0, 8)}...</span></div>}
-                            </div>
-                          </div>
-                        )}
 
                         <div>
                           <label className="block text-sm font-medium text-dark mb-2">Атрибуты навыка</label>
@@ -424,18 +467,6 @@ export const SkillsReviewPage: FC = () => {
                       </div>
                     ) : (
                       <div className="space-y-4 bg-white p-4 rounded-lg">
-                        {(selectedSkill?.skillType || selectedSkill?.direction || selectedSkill?.level || selectedSkill?.professionId) && (
-                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-                            <div className="font-medium text-blue-900 mb-2">📋 Предложенные системой атрибуты:</div>
-                            <div className="space-y-1 text-blue-800 text-xs">
-                              {selectedSkill?.skillType && <div>Тип: <span className="font-semibold">{selectedSkill.skillType}</span></div>}
-                              {selectedSkill?.direction && <div>Направление: <span className="font-semibold">{selectedSkill.direction}</span></div>}
-                              {selectedSkill?.level && <div>Уровень: <span className="font-semibold">{selectedSkill.level}</span></div>}
-                              {selectedSkill?.professionId && <div>Профессия ID: <span className="font-semibold">{selectedSkill.professionId.substring(0, 8)}...</span></div>}
-                            </div>
-                          </div>
-                        )}
-
                         <div>
                           <label className="block text-sm font-medium text-dark mb-2">
                             Поиск существующего навыка

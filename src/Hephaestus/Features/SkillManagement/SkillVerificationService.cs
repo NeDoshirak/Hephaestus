@@ -20,7 +20,7 @@ public class SkillVerificationService(
             if (skillOnReview == null)
                 throw new InvalidOperationException($"Skill on review with id {skillOnReviewId} not found");
 
-            CleanSkill cleanSkill;
+            CleanSkill? cleanSkill;
 
             if (request.ExistingCleanSkillId.HasValue)
             {

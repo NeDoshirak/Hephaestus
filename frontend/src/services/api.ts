@@ -124,6 +124,12 @@ export const skillsAPI = {
     const response = await apiClient.post('/skills/clean/add', data);
     return response.data;
   },
+
+  // Get import status
+  async getImportStatus(): Promise<any> {
+    const response = await apiClient.get('/skills/import-status');
+    return response.data;
+  },
 };
 
 export const hhAPI = {

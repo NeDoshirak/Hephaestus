@@ -11,6 +11,7 @@ public class CleanSkillDto
     public string? Direction { get; set; }
     public string? Level { get; set; }
     public Guid? ProfessionId { get; set; }
+    public string? ProfessionName { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public List<SkillSynonymDto> Synonyms { get; set; } = new();
@@ -34,6 +35,10 @@ public class SkillOnReviewDto
     public int Counter { get; set; }
     public string Status { get; set; } = string.Empty;
     public string SuggestedDisplayName { get; set; } = string.Empty;
+    public string? SkillType { get; set; }
+    public string? Direction { get; set; }
+    public string? Level { get; set; }
+    public Guid? ProfessionId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
