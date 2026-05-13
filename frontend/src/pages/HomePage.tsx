@@ -11,7 +11,7 @@ export const HomePage: FC = () => {
   const [vacancySearch, setVacancySearch] = useState('');
   const [skillsFilter, setSkillsFilter] = useState('');
   const { import: importVacancies, isImporting, successMessage: vacancyMessage } = useImport();
-  const { import: importSkills, isImporting: isImportingSkills, successMessage: skillsMessage, importProgress } = useImportSkills();
+  const { import: importSkills, isImporting: isImportingSkills, successMessage: skillsMessage } = useImportSkills();
 
   const handleImportVacancies = () => {
     if (vacancySearch.trim()) {
@@ -149,25 +149,6 @@ export const HomePage: FC = () => {
               <Zap size={20} />
               {isImportingSkills ? 'Импортирую навыки...' : 'Импортировать навыки'}
             </Button>
-
-            {isImportingSkills && importProgress && (
-              <div className="mt-6 space-y-3">
-                <div className="text-sm text-gray-600">
-                  Обработано вакансий: <span className="font-bold">{importProgress.processedVacancies}</span> из{' '}
-                  <span className="font-bold">{importProgress.totalVacancies}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-purple-600 h-full transition-all duration-300"
-                    style={{ width: `${importProgress.progressPercent}%` }}
-                  />
-                </div>
-                <div className="text-sm text-gray-600">
-                  Найдено навыков: <span className="font-bold">{importProgress.totalSkills}</span> | Прогресс:{' '}
-                  <span className="font-bold">{importProgress.progressPercent}%</span>
-                </div>
-              </div>
-            )}
 
             {skillsMessage && (
               <div

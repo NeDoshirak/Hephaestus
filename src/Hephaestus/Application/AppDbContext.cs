@@ -33,6 +33,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<CleanSkill>()
             .HasIndex(c => c.NormalizedName)
             .IsUnique();
+        modelBuilder.Entity<CleanSkill>()
+            .HasQueryFilter(c => !c.IsDeleted);
 
         modelBuilder.Entity<SkillSynonym>()
             .HasKey(s => s.Id);

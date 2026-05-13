@@ -21,6 +21,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApiClients(builder.Configuration);
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddMcpServer()
+    .WithHttpTransport()
+    .WithTools<Hephaestus.Features.SkillReviewMcp.SkillReviewMcpTools>();
+
 // CORS
 builder.Services.AddCors(options =>
 {
@@ -51,6 +55,7 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapMcp("/mcp");
 
 // Open Swagger UI in browser on startup in Development mode
 if (app.Environment.IsDevelopment())

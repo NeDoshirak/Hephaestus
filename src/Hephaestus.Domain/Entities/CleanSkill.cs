@@ -15,6 +15,9 @@ public class CleanSkill
     public Guid? ProfessionId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAt { get; set; }
+    public string? DeletedReason { get; set; }
 
     public ICollection<SkillSynonym> Synonyms { get; set; } = new List<SkillSynonym>();
     public ICollection<SkillRelation> ParentRelations { get; set; } = new List<SkillRelation>();
