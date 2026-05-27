@@ -6,6 +6,7 @@ using Hephaestus.Features.OpenRouterClient;
 using Hephaestus.Features.ProfessionsManagement.Interfaces;
 using Hephaestus.Features.ProfessionsManagement.Services;
 using Hephaestus.Features.SkillManagement;
+using Hephaestus.Features.TrajectoryGeneration;
 using Hephaestus.Features.VacancySaver;
 using Hephaestus.Features.VacancyAiParsing;
 
@@ -28,6 +29,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVacancyParsingPromptBuilder, VacancyParsingPromptBuilder>();
         services.AddScoped<ISkillExtractionService, SkillExtractionService>();
         services.AddScoped<ISkillClassificationService, SkillClassificationService>();
+        services.AddScoped<ITrajectoryGenerationService, TrajectoryGenerationService>();
+        services.AddScoped<TrajectoryPromptBuilder>();
 
         return services;
     }
